@@ -235,10 +235,7 @@ void command_busconnect_parser( String &commandline ) {
 
   }
 
-
-  Serial.println(commandline);
-
-  Serial.println( commandline.length() );
+  Serial.println("Busconnect command not recognised!");
 
 }
 
