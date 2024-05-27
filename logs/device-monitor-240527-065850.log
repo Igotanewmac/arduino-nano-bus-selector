@@ -1,0 +1,32 @@
+Ready!
+
+<< >> pcftest
+PCF Test.
+PCF is Ok.
+Received: 0
+Sent 0x00
+Received: 1
+Done!
+
+>> i2cscan
+Scanning...
+I2C device found at address 0x20  !
+I2C device found at address 0x21  !
+done
+
+>> pcftest
+PCF Test.
+PCF is Ok.
+Received: FF
+Sent 0x00
+Received: 1
+Done!
+
+>> pcftest
+PCF Test.
+PCF is Ok.
+Received: 1
+Sent 0x00
+Received: 1
+Done!
+

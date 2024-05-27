@@ -1,0 +1,26 @@
+Ready!
+
+<< >> pcftest
+PCF Test.
+PCF is Ok.
+Received: AA
+Sent 0xA7
+Received: A7
+Done!
+
+>> pcftest
+PCF Test.
+PCF is Ok.
+Received: A7
+Sent 0xF1
+Received: F1
+Done!
+
+>> pcftest
+PCF Test.
+PCF is Ok.
+Received: F1
+Sent 0xD9
+Received: D9
+Done!
+
