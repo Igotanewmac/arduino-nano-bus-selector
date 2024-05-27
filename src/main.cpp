@@ -2,7 +2,6 @@
 #include <Arduino.h>
 
 
-
 // i2c tools
 #include <i2ctools.h>
 
