@@ -8,6 +8,9 @@
 i2ctools myi2ctoolsobj;
 
 
+#include <basetools.h>
+
+
 // include busconnector library.
 #include <busconnect.h>
 
@@ -28,13 +31,23 @@ busconnect mybusconnectobj;
 
 
 
+// ina219 library
+#include <ina219.h>
+
+// declare an array of 4 multimeters
+ina219 multimeter[4];
+
+
+
 
 
 // command function declarations
 
 void command_busconnect_parser( String &commandline );
 
+void command_dump_registers();
 
+void command_measure();
 
 
 
@@ -73,6 +86,13 @@ void setup() {
   // all channels are disabled
   // all channels are on default bus line 7
 
+
+
+  // configure ina219's
+  multimeter[0].begin( 0x40 );
+  multimeter[1].begin( 0x41 );
+  multimeter[2].begin( 0x44 );
+  multimeter[3].begin( 0x45 );
 
 
 
@@ -145,6 +165,13 @@ void loop() {
   }
 
 
+  if ( commandline.startsWith( "dr" ) ) { command_dump_registers(); return; }
+
+
+  if ( commandline.startsWith( "mr" ) ) { command_measure(); return; }
+
+
+
 
   // done command processing
   Serial.println("Command not recognised.");
@@ -157,11 +184,6 @@ void loop() {
 
 
 
-
-void showhex( uint8_t hexvalue ) {
-  if ( hexvalue < 16 ) { Serial.print( 0 ); }
-  Serial.print( hexvalue , HEX );
-}
 
 
 
@@ -243,14 +265,43 @@ void command_busconnect_parser( String &commandline ) {
 
 
 
+void command_dump_registers() {
+
+  uint16_t registervalue = 0x0000;
+
+  for ( uint8_t i = 0 ; i < 6 ; i++ ) {
+    registervalue = multimeter[0].dumpregister(i);
+    Serial.print(i); Serial.print(" : " );
+    showhex( registervalue >> 8 );
+    showhex( registervalue );
+    Serial.print(" : " );
+    showbin( registervalue >> 8 );
+    showbin( registervalue );
+    Serial.println();
+  }
+
+
+}
 
 
 
+void command_measure() {
+
+  Serial.println( "ID\tBus\tShunt\tCurrent\tPower" );
+
+  for ( uint8_t i = 0 ; i < 4 ; i++ ) {
+
+    Serial.print( i ); Serial.print( "\t" );
+    Serial.print( multimeter[i].getbusvoltage() ); Serial.print("\t" );
+    Serial.print( multimeter[i].getshuntvoltage() ); Serial.print("\t" );
+
+    Serial.println();
+
+  }
 
 
 
-
-
+}
 
 
 
