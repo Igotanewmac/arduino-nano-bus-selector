@@ -40,6 +40,21 @@ ina219 multimeter[4];
 
 
 
+// mcp4725 library
+#include <mcp4725.h>
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 // command function declarations
 
@@ -271,48 +286,6 @@ void command_busconnect_parser( String &commandline ) {
 
 
 
-
-void command_dump_registers() {
-
-  uint16_t registervalue = 0x0000;
-
-  for ( uint8_t i = 0 ; i < 6 ; i++ ) {
-    registervalue = multimeter[0].dumpregister(i);
-    Serial.print(i); Serial.print(" : " );
-    showhex( registervalue >> 8 );
-    showhex( registervalue );
-    Serial.print(" : " );
-    showbin( registervalue >> 8 );
-    showbin( registervalue );
-    Serial.print(" : ");
-    Serial.print( registervalue );
-    Serial.println();
-  }
-
-
-}
-
-
-
-void command_measure() {
-
-  Serial.println( "ID\tBus\tShunt\tCurrent\tPower" );
-
-  for ( uint8_t i = 0 ; i < 4 ; i++ ) {
-
-    Serial.print( i ); Serial.print( "\t" );
-    Serial.print( multimeter[i].getbusvoltage() ); Serial.print("\t" );
-    Serial.print( multimeter[i].getshuntvoltage() ); Serial.print("\t" );
-    Serial.print( multimeter[i].getcurrent() ); Serial.print("\t" );
-    Serial.print( multimeter[i].getpower() ); Serial.println();
-    
-  }
-
-}
-
-
-
-
 void command_ina219_parser( String &commandline ) {
 
   // clean up the input string
@@ -474,6 +447,49 @@ void command_ina219_parser( String &commandline ) {
 
 
 }
+
+
+
+void command_dump_registers() {
+
+  uint16_t registervalue = 0x0000;
+
+  for ( uint8_t i = 0 ; i < 6 ; i++ ) {
+    registervalue = multimeter[0].dumpregister(i);
+    Serial.print(i); Serial.print(" : " );
+    showhex( registervalue >> 8 );
+    showhex( registervalue );
+    Serial.print(" : " );
+    showbin( registervalue >> 8 );
+    showbin( registervalue );
+    Serial.print(" : ");
+    Serial.print( registervalue );
+    Serial.println();
+  }
+
+
+}
+
+
+
+void command_measure() {
+
+  Serial.println( "ID\tBus\tShunt\tCurrent\tPower" );
+
+  for ( uint8_t i = 0 ; i < 4 ; i++ ) {
+
+    Serial.print( i ); Serial.print( "\t" );
+    Serial.print( multimeter[i].getbusvoltage() ); Serial.print("\t" );
+    Serial.print( multimeter[i].getshuntvoltage() ); Serial.print("\t" );
+    Serial.print( multimeter[i].getcurrent() ); Serial.print("\t" );
+    Serial.print( multimeter[i].getpower() ); Serial.println();
+    
+  }
+
+}
+
+
+
 
 
 
