@@ -43,13 +43,15 @@ ina219 multimeter[4];
 // mcp4725 library
 #include <mcp4725.h>
 
+mcp4725 dacarray[2];
 
 
 
 
+// tca9548 library
+#include <tca9548.h>
 
-
-
+tca9548 i2cbusmaster;
 
 
 
@@ -63,6 +65,10 @@ String commandline = "";
 void command_busconnect_parser( String &commandline );
 
 void command_ina219_parser( String &commandline );
+
+void command_mcp4725_parser( String &commandline );
+
+void command_tca9548_parser( String &commandline );
 
 
 void command_dump_registers();
@@ -115,6 +121,19 @@ void setup() {
   multimeter[1].begin( 0x41 );
   multimeter[2].begin( 0x44 );
   multimeter[3].begin( 0x45 );
+
+
+  // turn on dacs
+  dacarray[0].begin( 0x60 );
+  dacarray[1].begin( 0x61 );
+
+
+
+  // i2c busmaster!
+  i2cbusmaster.begin( 0x70 );
+
+  i2cbusmaster.setbank(0);
+
 
 
 
@@ -187,6 +206,12 @@ void loop() {
   // ina219 command parser
   if ( commandline.startsWith( "ina219" ) ) { command_ina219_parser( commandline ); return; }
 
+  if ( commandline.startsWith( "mcp4725" ) ) { command_mcp4725_parser( commandline ); return; }
+
+
+  if ( commandline.startsWith( "tca9548" ) ) { command_tca9548_parser( commandline ); return; }
+
+
 
   // dump registers
   if ( commandline.startsWith( "dr" ) ) { command_dump_registers(); return; }
@@ -206,6 +231,27 @@ void loop() {
 
 
 
+
+void command_tca9548_parser( String &commandline ) {
+  commandline = commandline.substring( 8 );
+
+  if ( commandline.startsWith( "get" ) ) {
+    Serial.print( "I2cbus " );
+    Serial.print( i2cbusmaster.getbank() );
+    Serial.println( " is selected!" );
+  }
+
+  if ( commandline.startsWith( "set" ) ) {
+    commandline = commandline.substring( 4 );
+    uint8_t bankrequested = commandline.toInt();
+    i2cbusmaster.setbank( bankrequested );
+    Serial.print( "I2cbus " );
+    Serial.print( bankrequested );
+    Serial.println( " has been set" );
+
+  }
+
+}
 
 
 
@@ -282,9 +328,6 @@ void command_busconnect_parser( String &commandline ) {
   Serial.println("Busconnect command not recognised!");
 
 }
-
-
-
 
 void command_ina219_parser( String &commandline ) {
 
@@ -448,7 +491,109 @@ void command_ina219_parser( String &commandline ) {
 
 }
 
+void command_mcp4725_parser( String &commandline ) {
 
+  // clean up the input string
+  commandline = commandline.substring( 7 );
+  commandline.trim();
+  commandline.toLowerCase();
+
+  // handle empty string
+  if (!commandline.length()) { Serial.println("ina219 is awesome!" ); return; }
+
+  // get the device index
+  uint8_t deviceindex = commandline.toInt();
+  commandline = commandline.substring( commandline.indexOf(" ") + 1 );
+
+
+
+  // is this comand a getter or setter?
+  if ( commandline.startsWith( "get" ) ) {
+    commandline = commandline.substring( 4 );
+    
+    // operating value
+    if ( commandline.startsWith("val") ) {
+      uint16_t returnvalue = dacarray[deviceindex].getval();
+      Serial.print("Actual: ");
+      showhex( returnvalue >> 8 );
+      showhex( ( uint8_t)returnvalue );
+      Serial.print(" : ");
+      showbin( returnvalue >> 8 );
+      showbin( ( uint8_t)returnvalue );
+      Serial.print(" : " );
+      Serial.print( returnvalue );
+      Serial.println();
+      return;
+    }
+
+
+    // operating value
+    if ( commandline.startsWith("eeprom") ) {
+      uint16_t returnvalue = dacarray[deviceindex].geteepromval();
+      Serial.print("Actual: ");
+      showhex( returnvalue >> 8 );
+      showhex( ( uint8_t)returnvalue );
+      Serial.print(" : ");
+      showbin( returnvalue >> 8 );
+      showbin( ( uint8_t)returnvalue );
+      Serial.print(" : " );
+      Serial.print( returnvalue );
+      Serial.println();
+      return;
+    }
+
+
+  
+
+
+
+
+  }
+
+  // setters
+  if ( commandline.startsWith("set" ) ) {
+    commandline = commandline.substring( 4 );
+    
+    if ( commandline.startsWith("val") ) {
+      commandline = commandline.substring( 4 );
+
+      uint16_t requestedvalue = commandline.toInt();
+
+      Serial.print("Set device " );
+      Serial.print( deviceindex );
+      Serial.print( " is set to " );
+      Serial.println( requestedvalue );
+      
+      dacarray[deviceindex].setval( requestedvalue );
+
+    }
+
+
+
+    if ( commandline.startsWith("eeprom") ) {
+      commandline = commandline.substring( 7 );
+
+      uint16_t requestedvalue = commandline.toInt();
+
+      Serial.print("Set device " );
+      Serial.print( deviceindex );
+      Serial.print( " is set to " );
+      Serial.println( requestedvalue );
+      
+      dacarray[deviceindex].seteepromval( requestedvalue );
+
+    }
+
+
+
+  }
+
+
+
+
+
+
+}
 
 void command_dump_registers() {
 
@@ -467,10 +612,7 @@ void command_dump_registers() {
     Serial.println();
   }
 
-
 }
-
-
 
 void command_measure() {
 
@@ -487,13 +629,6 @@ void command_measure() {
   }
 
 }
-
-
-
-
-
-
-
 
 
 
