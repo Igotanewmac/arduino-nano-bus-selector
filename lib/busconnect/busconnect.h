@@ -19,7 +19,7 @@ class busconnect {
     private:
 
         /// @brief the channel address storage array.
-        uint8_t channeladdress[4] = {0};
+        uint8_t channeladdress[16] = {0};
 
         /// @brief fetch the current databyte from a pcf
         /// @param i2caddress the address of the device to fetch from

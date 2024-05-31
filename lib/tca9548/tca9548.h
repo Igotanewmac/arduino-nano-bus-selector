@@ -26,6 +26,8 @@ class tca9548 {
         void setbank( uint8_t bankmask );
         uint8_t getbank();
 
+        uint8_t isconnected();
+
 };
 
 

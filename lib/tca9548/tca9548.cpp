@@ -36,16 +36,16 @@ void tca9548::setbank( uint8_t bankmask ) {
     Wire.write( bankmask );
     Wire.endTransmission();
 
-};
+}
 
 
 
 uint8_t tca9548::getbank() {
 
-    Wire.requestFrom( _i2caddress , 1 );
+    Wire.requestFrom( (uint8_t)_i2caddress , (uint8_t)1 );
     return Wire.read();
 
-};
+}
 
 
 
@@ -56,7 +56,12 @@ uint8_t tca9548::getbank() {
 
 
 
+uint8_t tca9548::isconnected() {
 
+    Wire.beginTransmission( _i2caddress );
+    return Wire.endTransmission() == 0 ? 1 : 0;
+    
+}
 
 
 
