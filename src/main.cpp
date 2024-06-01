@@ -80,8 +80,16 @@ mcp4725 dacarray[2];
 
 tca9548 i2cbusmaster;
 
+
+
+
+
+
+
+// new definitions
 #define TCA9548_I2C_ADDRESS 0x70
 
+#define PCF8574_I2C_ADDRESS_0 0x20
 
 
 
@@ -760,6 +768,21 @@ void command_measure() {
 void command_pinset_parser( String &commandline ) {
 
   commandline = commandline.substring( 3 );
+  commandline.trim();
+  commandline.toLowerCase();
+
+  if ( commandline.equals("") ) {
+    
+    Serial.println("pinselect usage");
+    Serial.println("");
+    Serial.println("ps X Y Z");
+    Serial.println("X is pin to set");
+    Serial.println("Y is input bus to select");
+    Serial.println("Z is state to set");
+    Serial.println("");
+    return;
+  }
+
 
   Serial.print( "Pinset request: " );
   Serial.println( commandline );
@@ -781,26 +804,623 @@ void command_pinset_parser( String &commandline ) {
   Serial.println();
 
 
-  switch ( requestedpin )
-  {
-  case 1:
-    // pin 1
-    // bus 2
-    // pcf 0x20
-    // nibble 0
-    
-    // switch to the right bus
-    Wire.write( TCA9548_I2C_ADDRESS , 0b00000000 );
-    
-    // set the pin values
-    mybusconnectobj.setchannelinput( 0 , requestedinput );
-    mybusconnectobj.setchannelstate( 0 , requestedstate );
-
-    break;
+  switch ( requestedpin ) {
   
-  default:
-    Serial.println( "No change made! (switch case fallthrough!)");
-    break;
+    case 1: {
+      // pin 1
+      // bus 2
+      // pcf 0
+      // nibble 0
+
+      // switch to the right bus
+      Wire.beginTransmission( TCA9548_I2C_ADDRESS );
+      Wire.write( 0b00000010 );
+      Wire.endTransmission();
+      
+      // get the current state from the pcf
+      Wire.requestFrom( PCF8574_I2C_ADDRESS_0 , 1 );
+      uint8_t databyte = Wire.read();
+
+      Serial.print(" rcv: " );
+      showbin( databyte );
+      Serial.println();
+
+      // we are on the high bit, so set that now
+      databyte &= 0b11110000;
+      databyte |= ( requestedstate & 0b1 );
+      databyte |= ( ( requestedinput & 0b111 ) << 1 );
+
+      Serial.print( "snd: " );
+      showbin( databyte );
+      Serial.println();
+
+      Wire.beginTransmission( PCF8574_I2C_ADDRESS_0 );
+      Wire.write( databyte );
+      Wire.endTransmission();
+
+      break;
+    }
+
+
+
+    case 2: {
+      // pin 2
+      // bus 2
+      // pcf 0
+      // nibble 1
+
+      // switch to the right bus
+      Wire.beginTransmission( TCA9548_I2C_ADDRESS );
+      Wire.write( 0b00000010 );
+      Wire.endTransmission();
+      
+      // get the current state from the pcf
+      Wire.requestFrom( PCF8574_I2C_ADDRESS_0 , 1 );
+      uint8_t databyte = Wire.read();
+
+      Serial.print(" rcv: " );
+      showbin( databyte );
+      Serial.println();
+
+      // we are on the high bit, so set that now
+      databyte &= 0b00001111;
+      databyte |= ( ( requestedstate & 0b1 ) << 4);
+      databyte |= ( ( requestedinput & 0b111 ) << 5 );
+
+      Serial.print( "snd: " );
+      showbin( databyte );
+      Serial.println();
+
+      Wire.beginTransmission( PCF8574_I2C_ADDRESS_0 );
+      Wire.write( databyte );
+      Wire.endTransmission();
+
+      break;
+    }
+
+
+
+
+
+    case 3: {
+      // pin 1
+      // bus 2
+      // pcf 0
+      // nibble 0
+
+      // switch to the right bus
+      Wire.beginTransmission( TCA9548_I2C_ADDRESS );
+      Wire.write( 0b00000010 );
+      Wire.endTransmission();
+      
+      // get the current state from the pcf
+      Wire.requestFrom( PCF8574_I2C_ADDRESS_0 , 1 );
+      uint8_t databyte = Wire.read();
+
+      Serial.print(" rcv: " );
+      showbin( databyte );
+      Serial.println();
+
+      // we are on the high bit, so set that now
+      databyte &= 0b11110000;
+      databyte |= ( requestedstate & 0b1 );
+      databyte |= ( ( requestedinput & 0b111 ) << 1 );
+
+      Serial.print( "snd: " );
+      showbin( databyte );
+      Serial.println();
+
+      Wire.beginTransmission( PCF8574_I2C_ADDRESS_0 );
+      Wire.write( databyte );
+      Wire.endTransmission();
+
+      break;
+    }
+
+
+
+    case 4: {
+      // pin 2
+      // bus 2
+      // pcf 0
+      // nibble 1
+
+      // switch to the right bus
+      Wire.beginTransmission( TCA9548_I2C_ADDRESS );
+      Wire.write( 0b00000010 );
+      Wire.endTransmission();
+      
+      // get the current state from the pcf
+      Wire.requestFrom( PCF8574_I2C_ADDRESS_0 , 1 );
+      uint8_t databyte = Wire.read();
+
+      Serial.print(" rcv: " );
+      showbin( databyte );
+      Serial.println();
+
+      // we are on the high bit, so set that now
+      databyte &= 0b00001111;
+      databyte |= ( ( requestedstate & 0b1 ) << 4);
+      databyte |= ( ( requestedinput & 0b111 ) << 5 );
+
+      Serial.print( "snd: " );
+      showbin( databyte );
+      Serial.println();
+
+      Wire.beginTransmission( PCF8574_I2C_ADDRESS_0 );
+      Wire.write( databyte );
+      Wire.endTransmission();
+
+      break;
+    }
+
+
+    case 5: {
+      // pin 1
+      // bus 2
+      // pcf 0
+      // nibble 0
+
+      // switch to the right bus
+      Wire.beginTransmission( TCA9548_I2C_ADDRESS );
+      Wire.write( 0b00000010 );
+      Wire.endTransmission();
+      
+      // get the current state from the pcf
+      Wire.requestFrom( PCF8574_I2C_ADDRESS_0 , 1 );
+      uint8_t databyte = Wire.read();
+
+      Serial.print(" rcv: " );
+      showbin( databyte );
+      Serial.println();
+
+      // we are on the high bit, so set that now
+      databyte &= 0b11110000;
+      databyte |= ( requestedstate & 0b1 );
+      databyte |= ( ( requestedinput & 0b111 ) << 1 );
+
+      Serial.print( "snd: " );
+      showbin( databyte );
+      Serial.println();
+
+      Wire.beginTransmission( PCF8574_I2C_ADDRESS_0 );
+      Wire.write( databyte );
+      Wire.endTransmission();
+
+      break;
+    }
+
+
+
+    case 6: {
+      // pin 2
+      // bus 2
+      // pcf 0
+      // nibble 1
+
+      // switch to the right bus
+      Wire.beginTransmission( TCA9548_I2C_ADDRESS );
+      Wire.write( 0b00000010 );
+      Wire.endTransmission();
+      
+      // get the current state from the pcf
+      Wire.requestFrom( PCF8574_I2C_ADDRESS_0 , 1 );
+      uint8_t databyte = Wire.read();
+
+      Serial.print(" rcv: " );
+      showbin( databyte );
+      Serial.println();
+
+      // we are on the high bit, so set that now
+      databyte &= 0b00001111;
+      databyte |= ( ( requestedstate & 0b1 ) << 4);
+      databyte |= ( ( requestedinput & 0b111 ) << 5 );
+
+      Serial.print( "snd: " );
+      showbin( databyte );
+      Serial.println();
+
+      Wire.beginTransmission( PCF8574_I2C_ADDRESS_0 );
+      Wire.write( databyte );
+      Wire.endTransmission();
+
+      break;
+    }
+
+
+
+
+    case 7: {
+      // pin 1
+      // bus 2
+      // pcf 0
+      // nibble 0
+
+      // switch to the right bus
+      Wire.beginTransmission( TCA9548_I2C_ADDRESS );
+      Wire.write( 0b00000010 );
+      Wire.endTransmission();
+      
+      // get the current state from the pcf
+      Wire.requestFrom( PCF8574_I2C_ADDRESS_0 , 1 );
+      uint8_t databyte = Wire.read();
+
+      Serial.print(" rcv: " );
+      showbin( databyte );
+      Serial.println();
+
+      // we are on the high bit, so set that now
+      databyte &= 0b11110000;
+      databyte |= ( requestedstate & 0b1 );
+      databyte |= ( ( requestedinput & 0b111 ) << 1 );
+
+      Serial.print( "snd: " );
+      showbin( databyte );
+      Serial.println();
+
+      Wire.beginTransmission( PCF8574_I2C_ADDRESS_0 );
+      Wire.write( databyte );
+      Wire.endTransmission();
+
+      break;
+    }
+
+
+
+    case 8: {
+      // pin 2
+      // bus 2
+      // pcf 0
+      // nibble 1
+
+      // switch to the right bus
+      Wire.beginTransmission( TCA9548_I2C_ADDRESS );
+      Wire.write( 0b00000010 );
+      Wire.endTransmission();
+      
+      // get the current state from the pcf
+      Wire.requestFrom( PCF8574_I2C_ADDRESS_0 , 1 );
+      uint8_t databyte = Wire.read();
+
+      Serial.print(" rcv: " );
+      showbin( databyte );
+      Serial.println();
+
+      // we are on the high bit, so set that now
+      databyte &= 0b00001111;
+      databyte |= ( ( requestedstate & 0b1 ) << 4);
+      databyte |= ( ( requestedinput & 0b111 ) << 5 );
+
+      Serial.print( "snd: " );
+      showbin( databyte );
+      Serial.println();
+
+      Wire.beginTransmission( PCF8574_I2C_ADDRESS_0 );
+      Wire.write( databyte );
+      Wire.endTransmission();
+
+      break;
+    }
+
+
+
+
+
+
+    case 9: {
+      // pin 1
+      // bus 2
+      // pcf 0
+      // nibble 0
+
+      // switch to the right bus
+      Wire.beginTransmission( TCA9548_I2C_ADDRESS );
+      Wire.write( 0b00000010 );
+      Wire.endTransmission();
+      
+      // get the current state from the pcf
+      Wire.requestFrom( PCF8574_I2C_ADDRESS_0 , 1 );
+      uint8_t databyte = Wire.read();
+
+      Serial.print(" rcv: " );
+      showbin( databyte );
+      Serial.println();
+
+      // we are on the high bit, so set that now
+      databyte &= 0b11110000;
+      databyte |= ( requestedstate & 0b1 );
+      databyte |= ( ( requestedinput & 0b111 ) << 1 );
+
+      Serial.print( "snd: " );
+      showbin( databyte );
+      Serial.println();
+
+      Wire.beginTransmission( PCF8574_I2C_ADDRESS_0 );
+      Wire.write( databyte );
+      Wire.endTransmission();
+
+      break;
+    }
+
+
+
+    case 10: {
+      // pin 2
+      // bus 2
+      // pcf 0
+      // nibble 1
+
+      // switch to the right bus
+      Wire.beginTransmission( TCA9548_I2C_ADDRESS );
+      Wire.write( 0b00000010 );
+      Wire.endTransmission();
+      
+      // get the current state from the pcf
+      Wire.requestFrom( PCF8574_I2C_ADDRESS_0 , 1 );
+      uint8_t databyte = Wire.read();
+
+      Serial.print(" rcv: " );
+      showbin( databyte );
+      Serial.println();
+
+      // we are on the high bit, so set that now
+      databyte &= 0b00001111;
+      databyte |= ( ( requestedstate & 0b1 ) << 4);
+      databyte |= ( ( requestedinput & 0b111 ) << 5 );
+
+      Serial.print( "snd: " );
+      showbin( databyte );
+      Serial.println();
+
+      Wire.beginTransmission( PCF8574_I2C_ADDRESS_0 );
+      Wire.write( databyte );
+      Wire.endTransmission();
+
+      break;
+    }
+
+
+
+
+
+    case 11: {
+      // pin 1
+      // bus 2
+      // pcf 0
+      // nibble 0
+
+      // switch to the right bus
+      Wire.beginTransmission( TCA9548_I2C_ADDRESS );
+      Wire.write( 0b00000010 );
+      Wire.endTransmission();
+      
+      // get the current state from the pcf
+      Wire.requestFrom( PCF8574_I2C_ADDRESS_0 , 1 );
+      uint8_t databyte = Wire.read();
+
+      Serial.print(" rcv: " );
+      showbin( databyte );
+      Serial.println();
+
+      // we are on the high bit, so set that now
+      databyte &= 0b11110000;
+      databyte |= ( requestedstate & 0b1 );
+      databyte |= ( ( requestedinput & 0b111 ) << 1 );
+
+      Serial.print( "snd: " );
+      showbin( databyte );
+      Serial.println();
+
+      Wire.beginTransmission( PCF8574_I2C_ADDRESS_0 );
+      Wire.write( databyte );
+      Wire.endTransmission();
+
+      break;
+    }
+
+
+
+    case 12: {
+      // pin 2
+      // bus 2
+      // pcf 0
+      // nibble 1
+
+      // switch to the right bus
+      Wire.beginTransmission( TCA9548_I2C_ADDRESS );
+      Wire.write( 0b00000010 );
+      Wire.endTransmission();
+      
+      // get the current state from the pcf
+      Wire.requestFrom( PCF8574_I2C_ADDRESS_0 , 1 );
+      uint8_t databyte = Wire.read();
+
+      Serial.print(" rcv: " );
+      showbin( databyte );
+      Serial.println();
+
+      // we are on the high bit, so set that now
+      databyte &= 0b00001111;
+      databyte |= ( ( requestedstate & 0b1 ) << 4);
+      databyte |= ( ( requestedinput & 0b111 ) << 5 );
+
+      Serial.print( "snd: " );
+      showbin( databyte );
+      Serial.println();
+
+      Wire.beginTransmission( PCF8574_I2C_ADDRESS_0 );
+      Wire.write( databyte );
+      Wire.endTransmission();
+
+      break;
+    }
+
+
+
+
+
+    case 13: {
+      // pin 1
+      // bus 2
+      // pcf 0
+      // nibble 0
+
+      // switch to the right bus
+      Wire.beginTransmission( TCA9548_I2C_ADDRESS );
+      Wire.write( 0b00000010 );
+      Wire.endTransmission();
+      
+      // get the current state from the pcf
+      Wire.requestFrom( PCF8574_I2C_ADDRESS_0 , 1 );
+      uint8_t databyte = Wire.read();
+
+      Serial.print(" rcv: " );
+      showbin( databyte );
+      Serial.println();
+
+      // we are on the high bit, so set that now
+      databyte &= 0b11110000;
+      databyte |= ( requestedstate & 0b1 );
+      databyte |= ( ( requestedinput & 0b111 ) << 1 );
+
+      Serial.print( "snd: " );
+      showbin( databyte );
+      Serial.println();
+
+      Wire.beginTransmission( PCF8574_I2C_ADDRESS_0 );
+      Wire.write( databyte );
+      Wire.endTransmission();
+
+      break;
+    }
+
+
+
+    case 14: {
+      // pin 2
+      // bus 2
+      // pcf 0
+      // nibble 1
+
+      // switch to the right bus
+      Wire.beginTransmission( TCA9548_I2C_ADDRESS );
+      Wire.write( 0b00000010 );
+      Wire.endTransmission();
+      
+      // get the current state from the pcf
+      Wire.requestFrom( PCF8574_I2C_ADDRESS_0 , 1 );
+      uint8_t databyte = Wire.read();
+
+      Serial.print(" rcv: " );
+      showbin( databyte );
+      Serial.println();
+
+      // we are on the high bit, so set that now
+      databyte &= 0b00001111;
+      databyte |= ( ( requestedstate & 0b1 ) << 4);
+      databyte |= ( ( requestedinput & 0b111 ) << 5 );
+
+      Serial.print( "snd: " );
+      showbin( databyte );
+      Serial.println();
+
+      Wire.beginTransmission( PCF8574_I2C_ADDRESS_0 );
+      Wire.write( databyte );
+      Wire.endTransmission();
+
+      break;
+    }
+
+
+
+
+
+    case 15: {
+      // pin 1
+      // bus 2
+      // pcf 0
+      // nibble 0
+
+      // switch to the right bus
+      Wire.beginTransmission( TCA9548_I2C_ADDRESS );
+      Wire.write( 0b00000010 );
+      Wire.endTransmission();
+      
+      // get the current state from the pcf
+      Wire.requestFrom( PCF8574_I2C_ADDRESS_0 , 1 );
+      uint8_t databyte = Wire.read();
+
+      Serial.print(" rcv: " );
+      showbin( databyte );
+      Serial.println();
+
+      // we are on the high bit, so set that now
+      databyte &= 0b11110000;
+      databyte |= ( requestedstate & 0b1 );
+      databyte |= ( ( requestedinput & 0b111 ) << 1 );
+
+      Serial.print( "snd: " );
+      showbin( databyte );
+      Serial.println();
+
+      Wire.beginTransmission( PCF8574_I2C_ADDRESS_0 );
+      Wire.write( databyte );
+      Wire.endTransmission();
+
+      break;
+    }
+
+
+
+    case 16: {
+      // pin 2
+      // bus 2
+      // pcf 0
+      // nibble 1
+
+      // switch to the right bus
+      Wire.beginTransmission( TCA9548_I2C_ADDRESS );
+      Wire.write( 0b00000010 );
+      Wire.endTransmission();
+      
+      // get the current state from the pcf
+      Wire.requestFrom( PCF8574_I2C_ADDRESS_0 , 1 );
+      uint8_t databyte = Wire.read();
+
+      Serial.print(" rcv: " );
+      showbin( databyte );
+      Serial.println();
+
+      // we are on the high bit, so set that now
+      databyte &= 0b00001111;
+      databyte |= ( ( requestedstate & 0b1 ) << 4);
+      databyte |= ( ( requestedinput & 0b111 ) << 5 );
+
+      Serial.print( "snd: " );
+      showbin( databyte );
+      Serial.println();
+
+      Wire.beginTransmission( PCF8574_I2C_ADDRESS_0 );
+      Wire.write( databyte );
+      Wire.endTransmission();
+
+      break;
+    }
+
+
+
+
+
+
+
+
+
+    default: {
+      Serial.println( "No change made! (switch case fallthrough!)");
+      break;
+    }
+
+
   }
 
 
