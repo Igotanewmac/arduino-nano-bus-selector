@@ -128,6 +128,11 @@ void loop() {
   Serial.print("<<: " );
   Serial.println( commandline );
 
+  commandline.trim();
+  commandline.toLowerCase();
+
+  if ( commandline.equals("") ) { return; }
+
   // test command to check if we are connected
   if ( commandline.startsWith( "test" ) ) { Serial.println("Testing 123" ); return; }
 
@@ -338,12 +343,12 @@ void command_ina219_parser( String &commandline ) {
 void command_mcp4725_parser( String &commandline ) {
 
   // clean up the input string
-  commandline = commandline.substring( 7 );
+  commandline = commandline.substring( 4 );
   commandline.trim();
   commandline.toLowerCase();
 
   // handle empty string
-  if (!commandline.length()) { Serial.println("ina219 is awesome!" ); return; }
+  if (!commandline.length()) { Serial.println("mcp4725 is awesome!" ); return; }
 
   // get the device index
   uint8_t deviceindex = commandline.toInt();
@@ -492,6 +497,7 @@ void command_measure() {
 
 
 
+
 // command: ps PIN BUS STATE
 
 void command_pinset_parser( String &commandline ) {
@@ -510,9 +516,6 @@ void command_pinset_parser( String &commandline ) {
     Serial.println("");
     return;
   }
-
-  Serial.print( "Pinset request: " );
-  Serial.println( commandline );
 
   if ( commandline.startsWith( "show" ) ) {
 
@@ -668,22 +671,9 @@ void command_pinset_parser( String &commandline ) {
 
   uint8_t requestedstate = commandline.toInt();
 
-  Serial.print( "Setting pin " );
-  Serial.print( requestedpin );
-  Serial.print( " to bus " );
-  Serial.print( requestedinput );
-  Serial.print( " with state " );
-  Serial.print( requestedstate );
-  Serial.println();
-
   switch ( requestedpin ) {
   
     case 1: {
-      // pin 1
-      // bus 2
-      // pcf 0
-      // nibble 0
-
       // switch to the right bus
       Wire.beginTransmission( TCA9548_I2C_ADDRESS );
       Wire.write( 0b00000010 );
@@ -693,18 +683,10 @@ void command_pinset_parser( String &commandline ) {
       Wire.requestFrom( PCF8574_I2C_ADDRESS_0 , 1 );
       uint8_t databyte = Wire.read();
 
-      Serial.print(" rcv: " );
-      showbin( databyte );
-      Serial.println();
-
       // we are on the high bit, so set that now
       databyte &= 0b11110000;
       databyte |= ( requestedstate & 0b1 );
       databyte |= ( ( requestedinput & 0b111 ) << 1 );
-
-      Serial.print( "snd: " );
-      showbin( databyte );
-      Serial.println();
 
       Wire.beginTransmission( PCF8574_I2C_ADDRESS_0 );
       Wire.write( databyte );
@@ -714,11 +696,6 @@ void command_pinset_parser( String &commandline ) {
     }
 
     case 2: {
-      // pin 2
-      // bus 2
-      // pcf 0
-      // nibble 1
-
       // switch to the right bus
       Wire.beginTransmission( TCA9548_I2C_ADDRESS );
       Wire.write( 0b00000010 );
@@ -728,18 +705,10 @@ void command_pinset_parser( String &commandline ) {
       Wire.requestFrom( PCF8574_I2C_ADDRESS_0 , 1 );
       uint8_t databyte = Wire.read();
 
-      Serial.print(" rcv: " );
-      showbin( databyte );
-      Serial.println();
-
       // we are on the high bit, so set that now
       databyte &= 0b00001111;
       databyte |= ( ( requestedstate & 0b1 ) << 4);
       databyte |= ( ( requestedinput & 0b111 ) << 5 );
-
-      Serial.print( "snd: " );
-      showbin( databyte );
-      Serial.println();
 
       Wire.beginTransmission( PCF8574_I2C_ADDRESS_0 );
       Wire.write( databyte );
@@ -749,11 +718,6 @@ void command_pinset_parser( String &commandline ) {
     }
 
     case 3: {
-      // pin 3
-      // bus 2
-      // pcf 1
-      // nibble 0
-
       // switch to the right bus
       Wire.beginTransmission( TCA9548_I2C_ADDRESS );
       Wire.write( 0b00000010 );
@@ -763,18 +727,10 @@ void command_pinset_parser( String &commandline ) {
       Wire.requestFrom( PCF8574_I2C_ADDRESS_1 , 1 );
       uint8_t databyte = Wire.read();
 
-      Serial.print(" rcv: " );
-      showbin( databyte );
-      Serial.println();
-
       // we are on the high bit, so set that now
       databyte &= 0b11110000;
       databyte |= ( requestedstate & 0b1 );
       databyte |= ( ( requestedinput & 0b111 ) << 1 );
-
-      Serial.print( "snd: " );
-      showbin( databyte );
-      Serial.println();
 
       Wire.beginTransmission( PCF8574_I2C_ADDRESS_1 );
       Wire.write( databyte );
@@ -784,11 +740,6 @@ void command_pinset_parser( String &commandline ) {
     }
 
     case 4: {
-      // pin 4
-      // bus 2
-      // pcf 1
-      // nibble 1
-
       // switch to the right bus
       Wire.beginTransmission( TCA9548_I2C_ADDRESS );
       Wire.write( 0b00000010 );
@@ -798,18 +749,10 @@ void command_pinset_parser( String &commandline ) {
       Wire.requestFrom( PCF8574_I2C_ADDRESS_1 , 1 );
       uint8_t databyte = Wire.read();
 
-      Serial.print(" rcv: " );
-      showbin( databyte );
-      Serial.println();
-
       // we are on the high bit, so set that now
       databyte &= 0b00001111;
       databyte |= ( ( requestedstate & 0b1 ) << 4);
       databyte |= ( ( requestedinput & 0b111 ) << 5 );
-
-      Serial.print( "snd: " );
-      showbin( databyte );
-      Serial.println();
 
       Wire.beginTransmission( PCF8574_I2C_ADDRESS_1 );
       Wire.write( databyte );
@@ -819,11 +762,6 @@ void command_pinset_parser( String &commandline ) {
     }
 
     case 5: {
-      // pin 5
-      // bus 2
-      // pcf 2
-      // nibble 0
-
       // switch to the right bus
       Wire.beginTransmission( TCA9548_I2C_ADDRESS );
       Wire.write( 0b00000010 );
@@ -833,18 +771,10 @@ void command_pinset_parser( String &commandline ) {
       Wire.requestFrom( PCF8574_I2C_ADDRESS_2 , 1 );
       uint8_t databyte = Wire.read();
 
-      Serial.print(" rcv: " );
-      showbin( databyte );
-      Serial.println();
-
       // we are on the high bit, so set that now
       databyte &= 0b11110000;
       databyte |= ( requestedstate & 0b1 );
       databyte |= ( ( requestedinput & 0b111 ) << 1 );
-
-      Serial.print( "snd: " );
-      showbin( databyte );
-      Serial.println();
 
       Wire.beginTransmission( PCF8574_I2C_ADDRESS_2 );
       Wire.write( databyte );
@@ -854,11 +784,6 @@ void command_pinset_parser( String &commandline ) {
     }
 
     case 6: {
-      // pin 6
-      // bus 2
-      // pcf 2
-      // nibble 1
-
       // switch to the right bus
       Wire.beginTransmission( TCA9548_I2C_ADDRESS );
       Wire.write( 0b00000010 );
@@ -868,18 +793,10 @@ void command_pinset_parser( String &commandline ) {
       Wire.requestFrom( PCF8574_I2C_ADDRESS_2 , 1 );
       uint8_t databyte = Wire.read();
 
-      Serial.print(" rcv: " );
-      showbin( databyte );
-      Serial.println();
-
       // we are on the high bit, so set that now
       databyte &= 0b00001111;
       databyte |= ( ( requestedstate & 0b1 ) << 4);
       databyte |= ( ( requestedinput & 0b111 ) << 5 );
-
-      Serial.print( "snd: " );
-      showbin( databyte );
-      Serial.println();
 
       Wire.beginTransmission( PCF8574_I2C_ADDRESS_2 );
       Wire.write( databyte );
@@ -889,11 +806,6 @@ void command_pinset_parser( String &commandline ) {
     }
 
     case 7: {
-      // pin 7
-      // bus 2
-      // pcf 3
-      // nibble 0
-
       // switch to the right bus
       Wire.beginTransmission( TCA9548_I2C_ADDRESS );
       Wire.write( 0b00000010 );
@@ -903,18 +815,10 @@ void command_pinset_parser( String &commandline ) {
       Wire.requestFrom( PCF8574_I2C_ADDRESS_3 , 1 );
       uint8_t databyte = Wire.read();
 
-      Serial.print(" rcv: " );
-      showbin( databyte );
-      Serial.println();
-
       // we are on the high bit, so set that now
       databyte &= 0b11110000;
       databyte |= ( requestedstate & 0b1 );
       databyte |= ( ( requestedinput & 0b111 ) << 1 );
-
-      Serial.print( "snd: " );
-      showbin( databyte );
-      Serial.println();
 
       Wire.beginTransmission( PCF8574_I2C_ADDRESS_3 );
       Wire.write( databyte );
@@ -924,11 +828,6 @@ void command_pinset_parser( String &commandline ) {
     }
 
     case 8: {
-      // pin 8
-      // bus 2
-      // pcf 3
-      // nibble 1
-
       // switch to the right bus
       Wire.beginTransmission( TCA9548_I2C_ADDRESS );
       Wire.write( 0b00000010 );
@@ -938,18 +837,10 @@ void command_pinset_parser( String &commandline ) {
       Wire.requestFrom( PCF8574_I2C_ADDRESS_3 , 1 );
       uint8_t databyte = Wire.read();
 
-      Serial.print(" rcv: " );
-      showbin( databyte );
-      Serial.println();
-
       // we are on the high bit, so set that now
       databyte &= 0b00001111;
       databyte |= ( ( requestedstate & 0b1 ) << 4);
       databyte |= ( ( requestedinput & 0b111 ) << 5 );
-
-      Serial.print( "snd: " );
-      showbin( databyte );
-      Serial.println();
 
       Wire.beginTransmission( PCF8574_I2C_ADDRESS_3 );
       Wire.write( databyte );
@@ -959,11 +850,6 @@ void command_pinset_parser( String &commandline ) {
     }
 
     case 9: {
-      // pin 9
-      // bus 4
-      // pcf 4
-      // nibble 0
-
       // switch to the right bus
       Wire.beginTransmission( TCA9548_I2C_ADDRESS );
       Wire.write( 0b00000100 );
@@ -973,18 +859,10 @@ void command_pinset_parser( String &commandline ) {
       Wire.requestFrom( PCF8574_I2C_ADDRESS_4 , 1 );
       uint8_t databyte = Wire.read();
 
-      Serial.print(" rcv: " );
-      showbin( databyte );
-      Serial.println();
-
       // we are on the high bit, so set that now
       databyte &= 0b11110000;
       databyte |= ( requestedstate & 0b1 );
       databyte |= ( ( requestedinput & 0b111 ) << 1 );
-
-      Serial.print( "snd: " );
-      showbin( databyte );
-      Serial.println();
 
       Wire.beginTransmission( PCF8574_I2C_ADDRESS_4 );
       Wire.write( databyte );
@@ -994,11 +872,6 @@ void command_pinset_parser( String &commandline ) {
     }
 
     case 10: {
-      // pin 10
-      // bus 4
-      // pcf 4
-      // nibble 1
-
       // switch to the right bus
       Wire.beginTransmission( TCA9548_I2C_ADDRESS );
       Wire.write( 0b00000100 );
@@ -1008,18 +881,10 @@ void command_pinset_parser( String &commandline ) {
       Wire.requestFrom( PCF8574_I2C_ADDRESS_4 , 1 );
       uint8_t databyte = Wire.read();
 
-      Serial.print(" rcv: " );
-      showbin( databyte );
-      Serial.println();
-
       // we are on the high bit, so set that now
       databyte &= 0b00001111;
       databyte |= ( ( requestedstate & 0b1 ) << 4);
       databyte |= ( ( requestedinput & 0b111 ) << 5 );
-
-      Serial.print( "snd: " );
-      showbin( databyte );
-      Serial.println();
 
       Wire.beginTransmission( PCF8574_I2C_ADDRESS_4 );
       Wire.write( databyte );
@@ -1029,11 +894,6 @@ void command_pinset_parser( String &commandline ) {
     }
 
     case 11: {
-      // pin 11
-      // bus 4
-      // pcf 5
-      // nibble 0
-
       // switch to the right bus
       Wire.beginTransmission( TCA9548_I2C_ADDRESS );
       Wire.write( 0b00000100 );
@@ -1043,18 +903,10 @@ void command_pinset_parser( String &commandline ) {
       Wire.requestFrom( PCF8574_I2C_ADDRESS_5 , 1 );
       uint8_t databyte = Wire.read();
 
-      Serial.print(" rcv: " );
-      showbin( databyte );
-      Serial.println();
-
       // we are on the high bit, so set that now
       databyte &= 0b11110000;
       databyte |= ( requestedstate & 0b1 );
       databyte |= ( ( requestedinput & 0b111 ) << 1 );
-
-      Serial.print( "snd: " );
-      showbin( databyte );
-      Serial.println();
 
       Wire.beginTransmission( PCF8574_I2C_ADDRESS_5 );
       Wire.write( databyte );
@@ -1064,11 +916,6 @@ void command_pinset_parser( String &commandline ) {
     }
 
     case 12: {
-      // pin 12
-      // bus 4
-      // pcf 5
-      // nibble 1
-
       // switch to the right bus
       Wire.beginTransmission( TCA9548_I2C_ADDRESS );
       Wire.write( 0b00000100 );
@@ -1078,18 +925,10 @@ void command_pinset_parser( String &commandline ) {
       Wire.requestFrom( PCF8574_I2C_ADDRESS_5 , 1 );
       uint8_t databyte = Wire.read();
 
-      Serial.print(" rcv: " );
-      showbin( databyte );
-      Serial.println();
-
       // we are on the high bit, so set that now
       databyte &= 0b00001111;
       databyte |= ( ( requestedstate & 0b1 ) << 4);
       databyte |= ( ( requestedinput & 0b111 ) << 5 );
-
-      Serial.print( "snd: " );
-      showbin( databyte );
-      Serial.println();
 
       Wire.beginTransmission( PCF8574_I2C_ADDRESS_5 );
       Wire.write( databyte );
@@ -1099,11 +938,6 @@ void command_pinset_parser( String &commandline ) {
     }
 
     case 13: {
-      // pin 13
-      // bus 4
-      // pcf 6
-      // nibble 0
-
       // switch to the right bus
       Wire.beginTransmission( TCA9548_I2C_ADDRESS );
       Wire.write( 0b00000100 );
@@ -1113,18 +947,10 @@ void command_pinset_parser( String &commandline ) {
       Wire.requestFrom( PCF8574_I2C_ADDRESS_6 , 1 );
       uint8_t databyte = Wire.read();
 
-      Serial.print(" rcv: " );
-      showbin( databyte );
-      Serial.println();
-
       // we are on the high bit, so set that now
       databyte &= 0b11110000;
       databyte |= ( requestedstate & 0b1 );
       databyte |= ( ( requestedinput & 0b111 ) << 1 );
-
-      Serial.print( "snd: " );
-      showbin( databyte );
-      Serial.println();
 
       Wire.beginTransmission( PCF8574_I2C_ADDRESS_6 );
       Wire.write( databyte );
@@ -1134,11 +960,6 @@ void command_pinset_parser( String &commandline ) {
     }
 
     case 14: {
-      // pin 14
-      // bus 4
-      // pcf 6
-      // nibble 1
-
       // switch to the right bus
       Wire.beginTransmission( TCA9548_I2C_ADDRESS );
       Wire.write( 0b00000100 );
@@ -1148,18 +969,10 @@ void command_pinset_parser( String &commandline ) {
       Wire.requestFrom( PCF8574_I2C_ADDRESS_6 , 1 );
       uint8_t databyte = Wire.read();
 
-      Serial.print(" rcv: " );
-      showbin( databyte );
-      Serial.println();
-
       // we are on the high bit, so set that now
       databyte &= 0b00001111;
       databyte |= ( ( requestedstate & 0b1 ) << 4);
       databyte |= ( ( requestedinput & 0b111 ) << 5 );
-
-      Serial.print( "snd: " );
-      showbin( databyte );
-      Serial.println();
 
       Wire.beginTransmission( PCF8574_I2C_ADDRESS_6 );
       Wire.write( databyte );
@@ -1169,11 +982,6 @@ void command_pinset_parser( String &commandline ) {
     }
 
     case 15: {
-      // pin 15
-      // bus 4
-      // pcf 7
-      // nibble 0
-
       // switch to the right bus
       Wire.beginTransmission( TCA9548_I2C_ADDRESS );
       Wire.write( 0b00000100 );
@@ -1183,18 +991,10 @@ void command_pinset_parser( String &commandline ) {
       Wire.requestFrom( PCF8574_I2C_ADDRESS_7 , 1 );
       uint8_t databyte = Wire.read();
 
-      Serial.print(" rcv: " );
-      showbin( databyte );
-      Serial.println();
-
       // we are on the high bit, so set that now
       databyte &= 0b11110000;
       databyte |= ( requestedstate & 0b1 );
       databyte |= ( ( requestedinput & 0b111 ) << 1 );
-
-      Serial.print( "snd: " );
-      showbin( databyte );
-      Serial.println();
 
       Wire.beginTransmission( PCF8574_I2C_ADDRESS_7 );
       Wire.write( databyte );
@@ -1204,11 +1004,6 @@ void command_pinset_parser( String &commandline ) {
     }
 
     case 16: {
-      // pin 16
-      // bus 4
-      // pcf 7
-      // nibble 1
-
       // switch to the right bus
       Wire.beginTransmission( TCA9548_I2C_ADDRESS );
       Wire.write( 0b00000100 );
@@ -1218,18 +1013,10 @@ void command_pinset_parser( String &commandline ) {
       Wire.requestFrom( PCF8574_I2C_ADDRESS_7 , 1 );
       uint8_t databyte = Wire.read();
 
-      Serial.print(" rcv: " );
-      showbin( databyte );
-      Serial.println();
-
       // we are on the high bit, so set that now
       databyte &= 0b00001111;
       databyte |= ( ( requestedstate & 0b1 ) << 4);
       databyte |= ( ( requestedinput & 0b111 ) << 5 );
-
-      Serial.print( "snd: " );
-      showbin( databyte );
-      Serial.println();
 
       Wire.beginTransmission( PCF8574_I2C_ADDRESS_7 );
       Wire.write( databyte );
@@ -1282,30 +1069,88 @@ void command_7400_test( String &commandline ) {
 
   if ( commandline.startsWith("test") ) {
 
-      Serial.println("7400 Series Logic.");
-      Serial.println("");
-      Serial.println("Quad 2 input NAND gates.");
-      Serial.println("");
+    Serial.println("7400 Series Logic.");
+    Serial.println("");
+    Serial.println("Quad 2 input NAND gates.");
+    Serial.println("");
+    Serial.println("      +----u----+     ");
+    Serial.println("  1A -| 1    14 |- VCC");
+    Serial.println("  1B -| 2    13 |- 4B ");
+    Serial.println("  1Y -| 3    12 |- 4A ");
+    Serial.println("  2A -| 4    11 |- 4Y ");
+    Serial.println("  2B -| 5    10 |- 3B ");
+    Serial.println("  2Y -| 6    9  |- 3A ");
+    Serial.println(" GND -| 7    8  |- 3Y ");
+    Serial.println("      +---------+     ");
+    Serial.println("");
 
+    // input bus
+    // 0 GND
+    // 1 VCC
+    // 2 MGND
+    // 3 MVCC
+    // 4 VMVCC1
+    // 5 VMVCC2
+    // 6 NC
+    // 7 NC
+
+
+    Serial.println( "Testing gate 1.");
 
     // configure all the pins
-    // DAC1 to 1  1A
-    // DAC2 to 2  1B
-    // MGND to 2  1Y
-    //  VCC to 4  2A
-    //  VCC to 5  2B
-    //  GND to 6  2Y
-    //  GND to 7  GND
-    //  GND to 8  3Y
-    //  VCC to 9  3A
-    //  VCC to 10 3B
-    //  GND to 11 4Y
-    //  VCC to 12 4A
-    //  VCC to 13 4B
-    // MVCC to 14 VCC
-
     
+    String commandstring = "";
 
+    // 1A VMVCC1
+    commandstring = "ps 1 4 0";
+    command_pinset_parser( commandstring );
+    
+    // 1B VMVCC2
+    commandstring = "ps 2 5 0";
+    command_pinset_parser( commandstring );
+    
+    // 1Y MGND
+    commandstring = "ps 3 2 0";
+    command_pinset_parser( commandstring );
+    
+    // 2A VCC
+    commandstring = "ps 4 1 0";
+    command_pinset_parser( commandstring );
+    // 2B VCC
+    commandstring = "ps 5 1 0";
+    command_pinset_parser( commandstring );
+    // 2Y GND
+    commandstring = "ps 6 0 0";
+    command_pinset_parser( commandstring );
+
+    // 3A VCC
+    commandstring = "ps 11 1 0";
+    command_pinset_parser( commandstring );
+    // 3B VCC
+    commandstring = "ps 10 1 0";
+    command_pinset_parser( commandstring );
+    // 3Y GND
+    commandstring = "ps 9 0 0";
+    command_pinset_parser( commandstring );
+
+    // 4A VCC
+    commandstring = "ps 14 1 0";
+    command_pinset_parser( commandstring );
+    // 4B VCC
+    commandstring = "ps 15 1 0";
+    command_pinset_parser( commandstring );
+    // 4Y GND
+    commandstring = "ps 13 0 0";
+    command_pinset_parser( commandstring );
+
+    // GND GND
+    commandstring = "ps 7 0 0";
+    command_pinset_parser( commandstring );
+    // VCC VCC
+    commandstring = "ps 16 3 0";
+    command_pinset_parser( commandstring );
+    
+    Serial.println( "Bus configured!" );
 
 
     
