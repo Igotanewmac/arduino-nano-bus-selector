@@ -11,85 +11,29 @@ i2ctools myi2ctoolsobj;
 #include <basetools.h>
 
 
-// include busconnector library.
-#include <busconnect.h>
-
-// create a busconnector object.
-busconnect mybusconnectobj;
-
-
-// bus connector hardware addresses.
-#define  BUSCONNECT_CHANNEL_0_I2C_ADDRESS   0x20
-#define  BUSCONNECT_CHANNEL_0_BYTE_ADDRESS  0
-#define  BUSCONNECT_CHANNEL_1_I2C_ADDRESS   0x20
-#define  BUSCONNECT_CHANNEL_1_BYTE_ADDRESS  1
-#define  BUSCONNECT_CHANNEL_2_I2C_ADDRESS   0x21
-#define  BUSCONNECT_CHANNEL_2_BYTE_ADDRESS  0
-#define  BUSCONNECT_CHANNEL_3_I2C_ADDRESS   0x21
-#define  BUSCONNECT_CHANNEL_3_BYTE_ADDRESS  1
-
-#define  BUSCONNECT_CHANNEL_4_I2C_ADDRESS   0x22
-#define  BUSCONNECT_CHANNEL_4_BYTE_ADDRESS  0
-#define  BUSCONNECT_CHANNEL_5_I2C_ADDRESS   0x22
-#define  BUSCONNECT_CHANNEL_5_BYTE_ADDRESS  1
-#define  BUSCONNECT_CHANNEL_6_I2C_ADDRESS   0x23
-#define  BUSCONNECT_CHANNEL_6_BYTE_ADDRESS  0
-#define  BUSCONNECT_CHANNEL_7_I2C_ADDRESS   0x23
-#define  BUSCONNECT_CHANNEL_7_BYTE_ADDRESS  1
-
-#define  BUSCONNECT_CHANNEL_8_I2C_ADDRESS   0x24
-#define  BUSCONNECT_CHANNEL_8_BYTE_ADDRESS  0
-#define  BUSCONNECT_CHANNEL_9_I2C_ADDRESS   0x24
-#define  BUSCONNECT_CHANNEL_9_BYTE_ADDRESS  1
-#define  BUSCONNECT_CHANNEL_10_I2C_ADDRESS  0x25
-#define  BUSCONNECT_CHANNEL_10_BYTE_ADDRESS 0
-#define  BUSCONNECT_CHANNEL_11_I2C_ADDRESS  0x25
-#define  BUSCONNECT_CHANNEL_11_BYTE_ADDRESS 1
-
-#define  BUSCONNECT_CHANNEL_12_I2C_ADDRESS  0x26
-#define  BUSCONNECT_CHANNEL_12_BYTE_ADDRESS 0
-#define  BUSCONNECT_CHANNEL_13_I2C_ADDRESS  0x26
-#define  BUSCONNECT_CHANNEL_13_BYTE_ADDRESS 1
-#define  BUSCONNECT_CHANNEL_14_I2C_ADDRESS  0x27
-#define  BUSCONNECT_CHANNEL_14_BYTE_ADDRESS 0
-#define  BUSCONNECT_CHANNEL_15_I2C_ADDRESS  0x27
-#define  BUSCONNECT_CHANNEL_15_BYTE_ADDRESS 1
-
-
 
 
 // ina219 library
 #include <ina219.h>
-
 // declare an array of 4 multimeters
 ina219 multimeter[4];
 
-
-
-
 // mcp4725 library
 #include <mcp4725.h>
-
 mcp4725 dacarray[2];
-
-
-
-
-// tca9548 library
-#include <tca9548.h>
-
-tca9548 i2cbusmaster;
-
-
-
-
-
 
 
 // new definitions
 #define TCA9548_I2C_ADDRESS 0x70
 
 #define PCF8574_I2C_ADDRESS_0 0x20
+#define PCF8574_I2C_ADDRESS_1 0x21
+#define PCF8574_I2C_ADDRESS_2 0x22
+#define PCF8574_I2C_ADDRESS_3 0x23
+#define PCF8574_I2C_ADDRESS_4 0x24
+#define PCF8574_I2C_ADDRESS_5 0x25
+#define PCF8574_I2C_ADDRESS_6 0x26
+#define PCF8574_I2C_ADDRESS_7 0x27
 
 
 
@@ -100,20 +44,13 @@ tca9548 i2cbusmaster;
 
 String commandline = "";
 
-void command_busconnect_parser( String &commandline );
-
 void command_ina219_parser( String &commandline );
 
 void command_mcp4725_parser( String &commandline );
 
-void command_tca9548_parser( String &commandline );
-
-
-void command_dump_registers();
-
 void command_measure();
 
-
+void command_7400_test( String &commandline );
 
 
 // test routines
@@ -121,90 +58,11 @@ void command_measure();
 void command_pinset_parser( String &commandline );
 
 
-void command_7400_test( String &commandline );
-
 
 
 
 void setup() {
   // put your setup code here, to run once:
-
-
-
-  // i2c busmaster!
-  i2cbusmaster.begin( 0x70 );
-  i2cbusmaster.setbank(0);
-
-  // configure the bus connector object.
-
-  // call bigin to initialise the object.
-  mybusconnectobj.begin();
-
-  // set hardware addresses.
-  mybusconnectobj.setchanneladdresss( 0  , BUSCONNECT_CHANNEL_0_I2C_ADDRESS , BUSCONNECT_CHANNEL_0_BYTE_ADDRESS );
-  mybusconnectobj.setchanneladdresss( 1  , BUSCONNECT_CHANNEL_1_I2C_ADDRESS , BUSCONNECT_CHANNEL_1_BYTE_ADDRESS );
-  mybusconnectobj.setchanneladdresss( 2  , BUSCONNECT_CHANNEL_2_I2C_ADDRESS , BUSCONNECT_CHANNEL_2_BYTE_ADDRESS );
-  mybusconnectobj.setchanneladdresss( 3  , BUSCONNECT_CHANNEL_3_I2C_ADDRESS , BUSCONNECT_CHANNEL_3_BYTE_ADDRESS );
-  mybusconnectobj.setchanneladdresss( 4  , BUSCONNECT_CHANNEL_4_I2C_ADDRESS , BUSCONNECT_CHANNEL_4_BYTE_ADDRESS );
-  mybusconnectobj.setchanneladdresss( 5  , BUSCONNECT_CHANNEL_5_I2C_ADDRESS , BUSCONNECT_CHANNEL_5_BYTE_ADDRESS );
-  mybusconnectobj.setchanneladdresss( 6  , BUSCONNECT_CHANNEL_6_I2C_ADDRESS , BUSCONNECT_CHANNEL_6_BYTE_ADDRESS );
-  mybusconnectobj.setchanneladdresss( 7  , BUSCONNECT_CHANNEL_7_I2C_ADDRESS , BUSCONNECT_CHANNEL_7_BYTE_ADDRESS );
-  mybusconnectobj.setchanneladdresss( 8  , BUSCONNECT_CHANNEL_8_I2C_ADDRESS , BUSCONNECT_CHANNEL_8_BYTE_ADDRESS );
-  mybusconnectobj.setchanneladdresss( 9  , BUSCONNECT_CHANNEL_9_I2C_ADDRESS , BUSCONNECT_CHANNEL_9_BYTE_ADDRESS );
-  mybusconnectobj.setchanneladdresss( 10 , BUSCONNECT_CHANNEL_10_I2C_ADDRESS , BUSCONNECT_CHANNEL_10_BYTE_ADDRESS );
-  mybusconnectobj.setchanneladdresss( 11 , BUSCONNECT_CHANNEL_11_I2C_ADDRESS , BUSCONNECT_CHANNEL_11_BYTE_ADDRESS );
-  mybusconnectobj.setchanneladdresss( 12 , BUSCONNECT_CHANNEL_12_I2C_ADDRESS , BUSCONNECT_CHANNEL_12_BYTE_ADDRESS );
-  mybusconnectobj.setchanneladdresss( 13 , BUSCONNECT_CHANNEL_13_I2C_ADDRESS , BUSCONNECT_CHANNEL_13_BYTE_ADDRESS );
-  mybusconnectobj.setchanneladdresss( 14 , BUSCONNECT_CHANNEL_14_I2C_ADDRESS , BUSCONNECT_CHANNEL_14_BYTE_ADDRESS );
-  mybusconnectobj.setchanneladdresss( 15 , BUSCONNECT_CHANNEL_15_I2C_ADDRESS , BUSCONNECT_CHANNEL_15_BYTE_ADDRESS );
-  
-  // set everything to off.
-  i2cbusmaster.setbank(2);
-  mybusconnectobj.setchannelstate(  0 , 1 );
-  mybusconnectobj.setchannelstate(  1 , 1 );
-  mybusconnectobj.setchannelstate(  2 , 1 );
-  mybusconnectobj.setchannelstate(  3 , 1 );
-  mybusconnectobj.setchannelstate(  4 , 1 );
-  mybusconnectobj.setchannelstate(  5 , 1 );
-  mybusconnectobj.setchannelstate(  6 , 1 );
-  mybusconnectobj.setchannelstate(  7 , 1 );
-  i2cbusmaster.setbank(4);
-  mybusconnectobj.setchannelstate(  8 , 1 );
-  mybusconnectobj.setchannelstate(  9 , 1 );
-  mybusconnectobj.setchannelstate( 10 , 1 );
-  mybusconnectobj.setchannelstate( 11 , 1 );
-  mybusconnectobj.setchannelstate( 12 , 1 );
-  mybusconnectobj.setchannelstate( 13 , 1 );
-  mybusconnectobj.setchannelstate( 14 , 1 );
-  mybusconnectobj.setchannelstate( 15 , 1 );
-
-  // set all busses to highest entry.
-  // we default to top because pcf defaults to on
-  // so at power on it will devault to 0b111 = 7
-  i2cbusmaster.setbank(2);
-  mybusconnectobj.setchannelinput(  0 , 7 );
-  mybusconnectobj.setchannelinput(  1 , 7 );
-  mybusconnectobj.setchannelinput(  2 , 7 );
-  mybusconnectobj.setchannelinput(  3 , 7 );
-  mybusconnectobj.setchannelinput(  4 , 7 );
-  mybusconnectobj.setchannelinput(  5 , 7 );
-  mybusconnectobj.setchannelinput(  6 , 7 );
-  mybusconnectobj.setchannelinput(  7 , 7 );
-  i2cbusmaster.setbank(4);
-  mybusconnectobj.setchannelinput(  8 , 7 );
-  mybusconnectobj.setchannelinput(  9 , 7 );
-  mybusconnectobj.setchannelinput( 10 , 7 );
-  mybusconnectobj.setchannelinput( 11 , 7 );
-  mybusconnectobj.setchannelinput( 12 , 7 );
-  mybusconnectobj.setchannelinput( 13 , 7 );
-  mybusconnectobj.setchannelinput( 14 , 7 );
-  mybusconnectobj.setchannelinput( 15 , 7 );
-  
-  // the bus is now in a known safe state.
-  // all channels are disabled
-  // all channels are on default bus line 7
-
-  i2cbusmaster.setbank(1);
 
   // configure ina219's
   multimeter[0].begin( 0x40 );
@@ -212,21 +70,12 @@ void setup() {
   multimeter[2].begin( 0x44 );
   multimeter[3].begin( 0x45 );
 
-
   // turn on dacs
   dacarray[0].begin( 0x60 );
   dacarray[1].begin( 0x61 );
 
-
-
-
-
-
-
   // turn on i2ctools for i2c scanner
   myi2ctoolsobj.begin();
-
-
 
   // all done
   
@@ -286,27 +135,20 @@ void loop() {
   if ( commandline.startsWith( "i2cscan" ) ) { myi2ctoolsobj.i2cscan(); return; }
 
 
-  // busconnect command parser
-  if ( commandline.startsWith( "bc" ) ) { command_busconnect_parser( commandline ); return; }
-
   // ina219 command parser
   if ( commandline.startsWith( "ina" ) ) { command_ina219_parser( commandline ); return; }
 
   if ( commandline.startsWith( "mcp" ) ) { command_mcp4725_parser( commandline ); return; }
-
-
-  if ( commandline.startsWith( "tca" ) ) { command_tca9548_parser( commandline ); return; }
-
-
-
-  // dump registers
-  if ( commandline.startsWith( "dr" ) ) { command_dump_registers(); return; }
 
   // quick measure
   if ( commandline.startsWith( "mr" ) ) { command_measure(); return; }
 
 
 
+
+
+
+  // pinset parser
   if ( commandline.startsWith("ps" ) ) { command_pinset_parser( commandline ); return; }
 
 
@@ -330,123 +172,6 @@ void loop() {
 
 
 
-void command_tca9548_parser( String &commandline ) {
-  commandline = commandline.substring( 4 );
-
-  if ( commandline.startsWith( "get" ) ) {
-    Serial.print( "I2cbus " );
-    Serial.print( i2cbusmaster.getbank() );
-    Serial.print( " : " );
-    showbin( i2cbusmaster.getbank() );
-    Serial.println( " is selected!" );
-    return;
-  }
-
-  if ( commandline.startsWith( "set" ) ) {
-    commandline = commandline.substring( 4 );
-    uint8_t bankrequested = commandline.toInt();
-    i2cbusmaster.setbank( bankrequested );
-    Serial.print( "I2cbus " );
-    Serial.print( bankrequested );
-    Serial.print( " " );
-    showbin( bankrequested );
-    Serial.println( " has been set" );
-    return;
-  }
-
-  Serial.println( "Usage: " );
-  Serial.println( "tca set N");
-  Serial.println( "Sets the i2c bus number" );
-  Serial.println( "tca get" );
-  Serial.println( "Gets the current i2c bus" );
-
-}
-
-void command_busconnect_parser( String &commandline ) {
-
-  // clean up the input string
-  commandline = commandline.substring( 3 );
-  commandline.trim();
-  commandline.toLowerCase();
-
-  // handle empty string
-  if (!commandline.length()) { Serial.println("busconnect loaded ok!" ); return; }
-
-
-  // actually do stuff
-  if ( commandline.startsWith("get") ) {
-    // show the current bus setup
-    Serial.println( "Chan\ti2c\tByte\tBus\tState" );
-
-    for ( uint8_t i = 0 ; i < 16 ; i++ ) {
-      
-      showhex( i ); Serial.print("\t");
-      showhex( mybusconnectobj.getchanneli2caddress( i ) ); Serial.print("\t");
-      showhex( mybusconnectobj.getchannelbyteaddress( i ) ); Serial.print("\t");
-      showhex( mybusconnectobj.getchannelinput( i ) ); Serial.print("\t");
-      showhex( mybusconnectobj.getchannelstate( i ) ); Serial.println(); 
-    }
-
-    return;
-
-  }
-
-
-
-  if ( commandline.startsWith("state") ) {
-    commandline = commandline.substring(6);
-    uint8_t requestedchannel = commandline.toInt();
-    commandline = commandline.substring( commandline.indexOf(" ") + 1 );
-    uint8_t requestedstate = commandline.toInt();
-    
-    Serial.print("Setting channel " );
-    Serial.print( requestedchannel );
-    Serial.print( " to state " );
-    Serial.print( requestedstate );
-    Serial.println(".");
-
-    mybusconnectobj.setchannelstate( requestedchannel , requestedstate );
-
-    Serial.println("Done!");
-
-    return;
-
-  }
-
-  if ( commandline.startsWith("input") ) {
-    commandline = commandline.substring(6);
-    uint8_t requestedchannel = commandline.toInt();
-    commandline = commandline.substring( commandline.indexOf(" ") + 1 );
-    uint8_t requestedinput = commandline.toInt();
-    
-    Serial.print("Setting channel " );
-    Serial.print( requestedchannel );
-    Serial.print( " to input " );
-    Serial.print( requestedinput );
-    Serial.println(".");
-
-    mybusconnectobj.setchannelinput( requestedchannel , requestedinput );
-
-    Serial.println("Done!");
-
-    return;
-
-  }
-
-
-  Serial.println("Busconnect usage");
-  Serial.println("");
-  Serial.println("Usage:");
-  Serial.println("bc get");
-  Serial.println("show the busconnect table");
-  Serial.println("bc input X N");
-  Serial.println("set channel X to input N");
-  Serial.println("bc state X N");
-  Serial.println("set channel X to state N");
-  Serial.println("");
-  
-  return;
-}
 
 void command_ina219_parser( String &commandline ) {
 
@@ -1485,80 +1210,7 @@ void command_7400_test( String &commandline ) {
     //  VCC to 13 4B
     // MVCC to 14 VCC
 
-    // switch bank to first bus
-    i2cbusmaster.setbank(2);
-
-    // configure all the pins
-    // DAC1 to 1  1A
-    mybusconnectobj.setchannelinput( 0 , 2 );
-    mybusconnectobj.setchannelstate( 0 , 0 );
-
-    // DAC2 to 2  1B
-    mybusconnectobj.setchannelinput( 1 , 3 );
-    mybusconnectobj.setchannelstate( 1 , 0 );
-
-    // MGND to 2  1Y
-    mybusconnectobj.setchannelinput( 2 , 4 );
-    mybusconnectobj.setchannelstate( 2 , 0 );
-
-    //  VCC to 4  2A
-    mybusconnectobj.setchannelinput( 3 , 1 );
-    mybusconnectobj.setchannelstate( 3 , 0 );
-
-    //  VCC to 5  2B
-    mybusconnectobj.setchannelinput( 4 , 1 );
-    mybusconnectobj.setchannelstate( 4 , 0 );
-
-    //  GND to 6  2Y
-    mybusconnectobj.setchannelinput( 5 , 0 );
-    mybusconnectobj.setchannelstate( 5 , 0 );
-
-    //  GND to 7  GND
-    mybusconnectobj.setchannelinput( 6 , 0 );
-    mybusconnectobj.setchannelstate( 6 , 0 );
-
-    // skip 7
-
-    // skip 8
-
-    i2cbusmaster.setbank(4);
-
-    //  GND to 8  3Y
-    mybusconnectobj.setchannelinput( 9 , 0 );
-    mybusconnectobj.setchannelstate( 9 , 0 );
     
-    //  VCC to 9  3A
-    mybusconnectobj.setchannelinput( 10 , 1 );
-    mybusconnectobj.setchannelstate( 10 , 0 );
-    
-    //  VCC to 10 3B
-    mybusconnectobj.setchannelinput( 11 , 1 );
-    mybusconnectobj.setchannelstate( 11 , 0 );
-    
-    //  GND to 11 4Y
-    mybusconnectobj.setchannelinput( 12 , 0 );
-    mybusconnectobj.setchannelstate( 12 , 0 );
-    
-    //  VCC to 12 4A
-    mybusconnectobj.setchannelinput( 13 , 1 );
-    mybusconnectobj.setchannelstate( 13 , 0 );
-    
-    //  VCC to 13 4B
-    mybusconnectobj.setchannelinput( 14 , 1 );
-    mybusconnectobj.setchannelstate( 14 , 0 );
-    
-    // MVCC to 14 VCC
-    mybusconnectobj.setchannelinput( 15 , 5 );
-    mybusconnectobj.setchannelstate( 15 , 0 );
-    
-    
-    i2cbusmaster.setbank(1);
-
-
-    Serial.println("Bus Configured\n");
-
-    command_measure();
-
 
 
 
